@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -43,13 +44,13 @@ public class NotificationsController {
      * @see NotificationResource
      */
     @GetMapping("/{userid}")
-    public ResponseEntity<NotificationResource> getNotifications(@PathVariable Long userid){
+    public ResponseEntity<List<NotificationResource>> getNotifications(@PathVariable Long userid){
         var getAllNotificationsByUserIdQuery = new GetAllNotificationsByUserIdQuery(userid);
         var notifications = notificationQueryService.handle(getAllNotificationsByUserIdQuery);
         var notificationResources = notifications.stream()
                 .map(NotificationResourceFromEntityAssembler::toResourceFromEntity)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(notificationResources.getFirst());
+                .toList();
+        return ResponseEntity.ok(notificationResources);
     }
 
     /**
@@ -60,7 +61,7 @@ public class NotificationsController {
      * @see ReadNotificationResource
      */
     @PostMapping("/{id}/read")
-    public ResponseEntity<ReadNotificationResource> updateNotificationtoRead(@PathVariable Long id){
+    public ResponseEntity<ReadNotificationResource> updateNotificationToRead(@PathVariable Long id){
         var readNotificationResource = new ReadNotificationResource(id);
         var readNotificationCommand = ReadNotificationCommandFromResourceAssembler.toCommandFromResources(readNotificationResource);
         notificationCommandService.handle(readNotificationCommand);

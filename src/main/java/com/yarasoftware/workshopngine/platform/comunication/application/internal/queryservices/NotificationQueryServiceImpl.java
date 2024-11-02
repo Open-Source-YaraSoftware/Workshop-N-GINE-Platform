@@ -23,11 +23,7 @@ public class NotificationQueryServiceImpl implements NotificationQueryService {
 
 
     public List<Notification> handle(GetAllNotificationsByUserIdQuery query) {
-
-        var notifications = notificationRepository.findAll();
-
-        return notifications.stream().filter(notification -> notification.getUserId().equals(query.userId())).toList();
-        //return notificationRepository.findAllByUserId(query.userId());
+        return notificationRepository.findAllByUserId(query.userId());
     }
 
 }
