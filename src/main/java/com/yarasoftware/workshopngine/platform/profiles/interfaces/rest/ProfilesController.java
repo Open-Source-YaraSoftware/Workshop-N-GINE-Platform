@@ -4,8 +4,12 @@ import com.yarasoftware.workshopngine.platform.profiles.domain.model.queries.Get
 import com.yarasoftware.workshopngine.platform.profiles.domain.model.queries.GetProfileByUserIdQuery;
 import com.yarasoftware.workshopngine.platform.profiles.domain.services.ProfileCommandService;
 import com.yarasoftware.workshopngine.platform.profiles.domain.services.ProfileQueryService;
+import com.yarasoftware.workshopngine.platform.profiles.interfaces.rest.resources.CreateProfileResource;
 import com.yarasoftware.workshopngine.platform.profiles.interfaces.rest.resources.ProfileResource;
+import com.yarasoftware.workshopngine.platform.profiles.interfaces.rest.resources.UpdateProfileResource;
+import com.yarasoftware.workshopngine.platform.profiles.interfaces.rest.transform.CreateProfileCommandFromResourceAssembler;
 import com.yarasoftware.workshopngine.platform.profiles.interfaces.rest.transform.ProfileResourceFromEntityAssembler;
+import com.yarasoftware.workshopngine.platform.profiles.interfaces.rest.transform.UpdateProfileCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -80,5 +84,39 @@ public class ProfilesController {
         if (profile.isEmpty()) return ResponseEntity.notFound().build();
         ProfileResource profileResource = ProfileResourceFromEntityAssembler.toResourceFromEntity(profile.get());
         return ResponseEntity.ok(profileResource);
+    }
+    /**
+     * Updates an existing profile with the specified ID using the provided data.
+     *
+     * @param profileId the ID of the profile to update
+     * @param resource the data to update the profile with
+     * @return a ResponseEntity containing the updated ProfileResource if successful, otherwise a bad request response
+     */
+    @PutMapping("{profileId}")
+    public ResponseEntity<ProfileResource> updateProfile(@PathVariable long profileId, @RequestBody UpdateProfileResource resource) {
+        var updateProfileCommand = UpdateProfileCommandFromResourceAssembler.toCommandFromResource(resource);
+        var profile = profileCommandService.handle(profileId, updateProfileCommand);
+        if (profile == null) return ResponseEntity.badRequest().build();
+        var getProfileById = new GetProfileByIdQuery(profile);
+        var profileUpdated = profileQueryService.handle(getProfileById);
+        ProfileResource profileResource = ProfileResourceFromEntityAssembler.toResourceFromEntity(profileUpdated.get());
+        return ResponseEntity.ok(profileResource);
+    }
+
+    /**
+     * Creates a new profile using the provided data.
+     *
+     * @param resource the data to create the profile with
+     * @return a ResponseEntity containing the created ProfileResource if successful, otherwise a bad request response
+     */
+    @PostMapping
+    public ResponseEntity<ProfileResource> createProfile(@RequestBody CreateProfileResource resource) {
+        var createProfileCommand = CreateProfileCommandFromResourceAssembler.toCommandFromResource(resource);
+        var profile = profileCommandService.handle(createProfileCommand);
+        if (profile == null) return ResponseEntity.badRequest().build();
+        var getProfileById = new GetProfileByIdQuery(profile);
+        var profileUpdated = profileQueryService.handle(getProfileById);
+        ProfileResource profileResource = ProfileResourceFromEntityAssembler.toResourceFromEntity(profileUpdated.get());
+        return ResponseEntity.created(URI.create("/api/v1/profiles/profile/" + profileResource.id())).body(profileResource);
     }
 }
