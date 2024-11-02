@@ -47,8 +47,8 @@ public class ProfilesController {
      * @param profileId the ID of the profile to retrieve
      * @return a ResponseEntity containing the ProfileResource if found, otherwise a bad request response
      */
-    @GetMapping("profile/{profileId}")
-    public ResponseEntity<ProfileResource> getProfileById(@PathVariable long profileId) {
+    @GetMapping("{profileId}")
+    public ResponseEntity<ProfileResource> getProfileById(@PathVariable Long profileId) {
         var getProfileByIdQuery = new GetProfileByIdQuery(profileId);
         var profile = profileQueryService.handle(getProfileByIdQuery);
         if (profile.isEmpty()) return ResponseEntity.badRequest().build();
@@ -57,33 +57,38 @@ public class ProfilesController {
     }
 
     /**
-     * Retrieves a profile by its DNI.
+     * Retrieves a profile based on either DNI or User ID.
      *
-     * @param dni the DNI of the profile to retrieve
-     * @return a ResponseEntity containing the ProfileResource if found, otherwise a not found response
-     */
-    @GetMapping("dni/{dni}")
-    public ResponseEntity<ProfileResource> getProfileByDni(@PathVariable int dni) {
-        var getProfileByDniQuery = new GetProfileByDniQuery(dni);
-        var profile = profileQueryService.handle(getProfileByDniQuery);
-        if (profile.isEmpty()) return ResponseEntity.notFound().build();
-        ProfileResource profileResource = ProfileResourceFromEntityAssembler.toResourceFromEntity(profile.get());
-        return ResponseEntity.ok(profileResource);
-    }
-
-    /**
-     * Retrieves a profile by the associated User ID.
+     * <p>
+     * This method allows fetching a profile by providing either a DNI or a User ID as a query parameter.
+     * If both parameters are provided, only DNI will be used. If neither parameter is provided,
+     * a {@code 400 Bad Request} response is returned.
+     * </p>
      *
-     * @param userId the ID of the user whose profile to retrieve
-     * @return a ResponseEntity containing the ProfileResource if found, otherwise a not found response
+     * @param dni the DNI of the profile to retrieve, optional
+     * @param userId the User ID of the profile to retrieve, optional
+     * @return a {@link ResponseEntity} containing the {@link ProfileResource} if found;
+     *         {@code 404 Not Found} if no profile matches the criteria;
+     *         or {@code 400 Bad Request} if neither parameter is provided or if userId is invalid.
      */
-    @GetMapping("user-id/{userId}")
-    public ResponseEntity<ProfileResource> getProfileByUserId(@PathVariable long userId) {
-        var getProfileByUserIdQuery = new GetProfileByUserIdQuery(userId);
-        var profile = profileQueryService.handle(getProfileByUserIdQuery);
-        if (profile.isEmpty()) return ResponseEntity.notFound().build();
-        ProfileResource profileResource = ProfileResourceFromEntityAssembler.toResourceFromEntity(profile.get());
-        return ResponseEntity.ok(profileResource);
+    @GetMapping("/profiles")
+    public ResponseEntity<ProfileResource> getProfile(@RequestParam(required = false) Integer dni, @RequestParam(required = false) Long userId) {
+        if (dni != null) {
+            var getProfileByDniQuery = new GetProfileByDniQuery(dni);
+            var profile = profileQueryService.handle(getProfileByDniQuery);
+            if (profile.isEmpty()) return ResponseEntity.notFound().build();
+            ProfileResource profileResource = ProfileResourceFromEntityAssembler.toResourceFromEntity(profile.get());
+            return ResponseEntity.ok(profileResource);
+        } else if (userId != null) {
+            if (userId <= 0) return ResponseEntity.badRequest().build();
+            var getProfileByUserIdQuery = new GetProfileByUserIdQuery(userId);
+            var profile = profileQueryService.handle(getProfileByUserIdQuery);
+            if (profile.isEmpty()) return ResponseEntity.notFound().build();
+            ProfileResource profileResource = ProfileResourceFromEntityAssembler.toResourceFromEntity(profile.get());
+            return ResponseEntity.ok(profileResource);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
     /**
      * Updates an existing profile with the specified ID using the provided data.
