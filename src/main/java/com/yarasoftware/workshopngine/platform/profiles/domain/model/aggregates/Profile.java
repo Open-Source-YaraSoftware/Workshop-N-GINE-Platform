@@ -70,4 +70,22 @@ public class Profile extends AbstractAggregateRoot<Profile> {
         this.location = location;
         this.userId = userId;
     }
+    /**
+     * Updates the profile information with the specified details.
+     *
+     * @param firstName the new first name of the user
+     * @param lastName  the new last name of the user
+     * @param dni       the new DNI of the user, must be an 8-digit number
+     * @param email     the new email address of the user, must be valid
+     * @param age       the new age of the user, must be between 0 and 120
+     * @param location  the new location of the user
+     */
+    public void updateProfileInformation(String firstName, String lastName, int dni, String email, int age, String location) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dni = dni;
+        this.email = email;
+        this.age = age;
+        this.location = location;
+    }
 }
