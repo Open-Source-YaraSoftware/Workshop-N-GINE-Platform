@@ -4,6 +4,7 @@ import com.yarasoftware.workshopngine.platform.profiles.domain.model.commands.Cr
 import com.yarasoftware.workshopngine.platform.profiles.domain.model.commands.UpdateProfileCommand;
 import com.yarasoftware.workshopngine.platform.profiles.domain.services.ProfileCommandService;
 import com.yarasoftware.workshopngine.platform.profiles.interfaces.acl.ProfilesContextFacade;
+import org.springframework.stereotype.Service;
 
 /**
  * Facade class for handling profile-related operations in the context.
@@ -15,6 +16,7 @@ import com.yarasoftware.workshopngine.platform.profiles.interfaces.acl.ProfilesC
  * a cohesive API for clients.
  * </p>
  */
+@Service
 public class ProfilesContextFacadeImpl implements ProfilesContextFacade {
 
     private final ProfileCommandService profileCommandService;
