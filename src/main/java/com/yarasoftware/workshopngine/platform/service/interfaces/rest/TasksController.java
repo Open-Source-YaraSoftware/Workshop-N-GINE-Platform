@@ -95,7 +95,7 @@ public class TasksController {
         }
         var createCheckpointCommand = CreateCheckpointCommandFromResourceAssembler.toCommand(taskId, createCheckpointResource);
         taskCommandService.handle(createCheckpointCommand);
-        return ResponseEntity.status(HttpStatus.CREATED).body(CheckpointResourceFromEntityAssembler.toResourceFromEntity(task.get().getAllCheckpoints().getLast()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CheckpointResourceFromEntityAssembler.toResourceFromEntity(task.get().getAllCheckpoints().get(task.get().getAllCheckpoints().size() - 1)));
     }
 
     @PostMapping
