@@ -11,4 +11,8 @@ public interface IamContextFacade {
     List<Long> fetchAllUserByWorkshopAndRoleIsOwner(Long workshopId);
 
     Long createUser(String username, String password, Long roleId, Long workshopId);
+
+    Long createUserWithRoleMechanic(String username, String password, Long workshopId);
+
+    Long createUserWithRoleClient(String username, String password, Long workshopId);
 }
