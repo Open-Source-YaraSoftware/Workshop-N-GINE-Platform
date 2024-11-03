@@ -52,4 +52,31 @@ public class Task extends AbstractAggregateRoot<Task> {
         this.assistantId = assistantId;
         this.interventionId = interventionId;
     }
+
+    public void completeTask() {
+        this.state = TaskState.DONE;
+    }
+
+    public void addCheckpoint(Checkpoint checkpoint) {
+        this.tracking.add(checkpoint);
+    }
+
+    public void deleteCheckpoint(Long checkpointId) {
+        this.tracking.removeIf(checkpoint -> checkpoint.getId().equals(checkpointId));
+    }
+
+    public void updateTask(String description, TaskState state, InventoryRequestState inventoryRequestState, Long assistantId) {
+        this.description = description;
+        this.state = state;
+        this.inventoryRequestState = inventoryRequestState;
+        this.assistantId = assistantId;
+    }
+
+    public List<Checkpoint> getAllCheckpoints() {
+        return tracking;
+    }
+
+    public void startSuppliesRequest() {
+        this.inventoryRequestState = InventoryRequestState.PENDING;
+    }
 }
