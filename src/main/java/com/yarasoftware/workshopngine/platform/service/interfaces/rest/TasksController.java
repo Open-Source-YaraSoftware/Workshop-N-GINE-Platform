@@ -76,4 +76,83 @@ public class TasksController {
         return ResponseEntity.ok(resources);
     }
 
+    @PostMapping("{taskId}/complete")
+    public ResponseEntity<?> completeTask(@PathVariable Long taskId) {
+        var task = taskRepository.findById(taskId);
+        if (task.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
+        var completeTaskCommand = new CompleteTaskCommand(taskId);
+        taskCommandService.handle(completeTaskCommand);
+        return ResponseEntity.ok("Task with given id has been completed");
+    }
+
+    @PostMapping("{taskId}/checkpoint")
+    public ResponseEntity<CheckpointResource> createCheckpoint(@PathVariable Long taskId, @RequestBody CreateCheckpointResource createCheckpointResource) {
+        var task = taskRepository.findById(taskId);
+        if (task.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
+        var createCheckpointCommand = CreateCheckpointCommandFromResourceAssembler.toCommand(taskId, createCheckpointResource);
+        taskCommandService.handle(createCheckpointCommand);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CheckpointResourceFromEntityAssembler.toResourceFromEntity(task.get().getAllCheckpoints().getLast()));
+    }
+
+    @PostMapping
+    public ResponseEntity<TaskResource> createTask(@RequestBody CreateTaskResource createTaskResource) {
+        var createTaskCommand = CreateTaskCommandFromResourceAssembler.toCommand(createTaskResource);
+        var taskId = taskCommandService.handle(createTaskCommand);
+        if (taskId == 0L) {
+            return ResponseEntity.badRequest().build();
+        }
+        var getTaskByIdQuery = new GetTaskByIdQuery(taskId);
+        var task = taskQueryService.handle(getTaskByIdQuery);
+        if (task.isEmpty()) return ResponseEntity.badRequest().build();
+        var taskResource = TaskResourceFromEntityAssembler.toResourceFromEntity(task.get());
+        return new ResponseEntity<>(taskResource, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("{taskId}/checkpoints/{checkpointId}")
+    public ResponseEntity<?> deleteCheckpoint(@PathVariable Long taskId, @PathVariable Long checkpointId) {
+        var task = taskRepository.findById(taskId);
+        if (task.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
+        var deleteCheckpointCommand = new DeleteCheckpointCommand(taskId, checkpointId);
+        taskCommandService.handle(deleteCheckpointCommand);
+        return ResponseEntity.ok("Checkpoint with given id has been deleted");
+    }
+
+    @DeleteMapping("{taskId}")
+    public ResponseEntity<?> deleteTask(@PathVariable Long taskId) {
+        var task = taskRepository.findById(taskId);
+        if (task.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
+        var deleteTaskCommand = new DeleteTaskCommand(taskId);
+        taskCommandService.handle(deleteTaskCommand);
+        return ResponseEntity.ok("Task with given id has been deleted");
+    }
+
+    @PutMapping("{taskId}/checkpoints/{checkpointId}")
+    public ResponseEntity<UpdateCheckpointResource> updateCheckpoint(@PathVariable Long taskId, @PathVariable Long checkpointId, @RequestBody UpdateCheckpointResource updateCheckpointResource) {
+        var task = taskRepository.findById(taskId);
+        if (task.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
+        var updateCheckpointCommand = UpdateCheckpointCommandFromResourceAssembler.toCommand(taskId, checkpointId, updateCheckpointResource);
+        taskCommandService.handle(updateCheckpointCommand);
+        return ResponseEntity.ok(updateCheckpointResource);
+    }
+
+    @PutMapping("{taskId}")
+    public ResponseEntity<TaskResource> updateTask(@PathVariable Long taskId, @RequestBody UpdateTaskResource updateTaskResource) {
+        var task = taskRepository.findById(taskId);
+        if (task.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
+        var updateTaskCommand = UpdateTaskCommandFromResourceAssembler.toCommand(taskId, updateTaskResource);
+        taskCommandService.handle(updateTaskCommand);
+        return ResponseEntity.ok(TaskResourceFromEntityAssembler.toResourceFromEntity(task.get()));
+    }
 }
