@@ -4,8 +4,9 @@ import com.yarasoftware.workshopngine.platform.subscription.domain.model.aggrega
 import com.yarasoftware.workshopngine.platform.subscription.domain.queries.GetPlanByIdQuery;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PlanQueryService {
-    List<Plan> getPaymentHistory(GetPlanByIdQuery query);
-    List<Plan> getAllPayments();
+    Optional<Plan> getPlanById(GetPlanByIdQuery query);
+    List<Plan> getAllPlans();
 }
