@@ -1,4 +1,4 @@
-﻿package com.yarasoftware.workshopngine.platform.billing.domain.model.valueobjects;
+package com.yarasoftware.workshopngine.platform.billing.domain.model.valueobjects;
 
 public class PaymentStatus {
 }

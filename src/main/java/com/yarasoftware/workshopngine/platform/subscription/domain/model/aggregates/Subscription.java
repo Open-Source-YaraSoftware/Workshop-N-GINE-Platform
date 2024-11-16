@@ -54,4 +54,8 @@ public class Subscription {
     public boolean isActive() {
         return status == SubscriptionStatus.ACTIVE && LocalDateTime.now().isBefore(endDate);
     }
+
+    public void setStatus(SubscriptionStatus status) {
+        this.status = status;
+    }
 }

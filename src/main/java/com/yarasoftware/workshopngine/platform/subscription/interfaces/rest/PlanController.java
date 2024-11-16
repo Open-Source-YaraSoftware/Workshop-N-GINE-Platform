@@ -1,14 +1,12 @@
 package com.yarasoftware.workshopngine.platform.subscription.interfaces.rest;
 
-import com.yarasoftware.workshopngine.platform.subscription.domain.commands.UpdateSubscriptionCommand;
+import com.yarasoftware.workshopngine.platform.subscription.domain.commands.CreatePlanCommand;
 import com.yarasoftware.workshopngine.platform.subscription.domain.queries.GetPlanByIdQuery;
 import com.yarasoftware.workshopngine.platform.subscription.domain.services.PlanCommandService;
 import com.yarasoftware.workshopngine.platform.subscription.domain.services.PlanQueryService;
 import com.yarasoftware.workshopngine.platform.subscription.interfaces.rest.resources.PlanResource;
 import com.yarasoftware.workshopngine.platform.subscription.interfaces.rest.transform.PlanResourceFromEntityAssembler;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,45 +14,52 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/payments")
-@RequiredArgsConstructor
-@Tag(name = "Payments", description = "Plan processing endpoints")
+@Tag(name = "Plan", description = "Plan Management Endpoints")
+@RequestMapping("/api/v1/plans")
 public class PlanController {
-    private final PlanCommandService paymentCommandService;
-    private final PlanQueryService paymentQueryService;
-    private final PlanResourceFromEntityAssembler paymentAssembler;
+    private final PlanCommandService planCommandService;
+    private final PlanQueryService planQueryService;
+    private final PlanResourceFromEntityAssembler planAssembler;
 
-    @Operation(summary = "Process payment")
-    @PostMapping
-    public ResponseEntity<Long> processPayment(@RequestBody UpdateSubscriptionCommand command) {
-        Long paymentId = paymentCommandService.processPayment(command);
-        return ResponseEntity.ok(paymentId);
+    public PlanController(PlanCommandService planCommandService,
+                          PlanQueryService planQueryService,
+                          PlanResourceFromEntityAssembler planAssembler) {
+        this.planCommandService = planCommandService;
+        this.planQueryService = planQueryService;
+        this.planAssembler = planAssembler;
     }
 
-    @Operation(summary = "Cancel payment")
-    @PostMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancelPayment(@PathVariable Long id) {
-        paymentCommandService.cancelPayment(id);
+    @PostMapping
+    public ResponseEntity<Long> createPlan(@RequestBody CreatePlanCommand command) {
+        Long planId = planCommandService.createPlan(command);
+        return ResponseEntity.ok(planId);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updatePlan(@PathVariable Long id, @RequestBody CreatePlanCommand command) {
+        planCommandService.updatePlan(id, command);
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Get payment history for membership")
-    @GetMapping("/history/{membershipId}")
-    public ResponseEntity<List<PlanResource>> getPaymentHistory(@PathVariable Long membershipId) {
-        List<PlanResource> history = paymentQueryService.getPaymentHistory(new GetPlanByIdQuery(membershipId))
-                .stream()
-                .map(paymentAssembler::toResource)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(history);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePlan(@PathVariable Long id) {
+        planCommandService.deletePlan(id);
+        return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Get all payments")
+    @GetMapping("/{id}")
+    public ResponseEntity<PlanResource> getPlan(@PathVariable Long id) {
+        return planQueryService.getPlanById(new GetPlanByIdQuery(id))
+                .map(plan -> ResponseEntity.ok(planAssembler.toResource(plan)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping
-    public ResponseEntity<List<PlanResource>> getAllPayments() {
-        List<PlanResource> payments = paymentQueryService.getAllPayments()
+    public ResponseEntity<List<PlanResource>> getAllPlans() {
+        List<PlanResource> plans = planQueryService.getAllPlans()
                 .stream()
-                .map(paymentAssembler::toResource)
+                .map(planAssembler::toResource)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(payments);
+        return ResponseEntity.ok(plans);
     }
 }

@@ -1,4 +1,4 @@
-﻿package com.yarasoftware.workshopngine.platform.billing.domain.services;
+package com.yarasoftware.workshopngine.platform.billing.domain.services;
 
 public class PaymentQueryService {
 }
