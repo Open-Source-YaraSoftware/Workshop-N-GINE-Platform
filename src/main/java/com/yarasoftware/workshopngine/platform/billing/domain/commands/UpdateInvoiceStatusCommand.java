@@ -1,4 +1,4 @@
-﻿package com.yarasoftware.workshopngine.platform.billing.domain.commands;
+package com.yarasoftware.workshopngine.platform.billing.domain.commands;
 
 import com.yarasoftware.workshopngine.platform.billing.domain.model.valueobjects.InvoiceStatus;
 
