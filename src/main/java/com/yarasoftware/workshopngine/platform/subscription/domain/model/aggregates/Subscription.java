@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "memberships")
+@Table(name = "subscriptions")
 @Getter
 @NoArgsConstructor
 public class Subscription {
@@ -16,9 +16,12 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "plan_id")
+    private Plan plan;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "membership_type")
-    private SubscriptionStatus membershipType;
+    private SubscriptionStatus status;
 
     @Column(name = "start_date")
     private LocalDateTime startDate;
@@ -26,26 +29,29 @@ public class Subscription {
     @Column(name = "end_date")
     private LocalDateTime endDate;
 
-    private Float amount;
-
     @Column(name = "workshop_id")
     private Long workshopId;
 
-    public static Subscription create(SubscriptionStatus type, Float amount, Long workshopId) {
-        Subscription membership = new Subscription();
-        membership.membershipType = type;
-        membership.amount = amount;
-        membership.workshopId = workshopId;
-        membership.startDate = LocalDateTime.now();
-        membership.endDate = membership.startDate.plusMonths(1);
-        return membership;
+    public static Subscription create(Plan plan, Long workshopId) {
+        Subscription subscription = new Subscription();
+        subscription.plan = plan;
+        subscription.workshopId = workshopId;
+        subscription.status = SubscriptionStatus.ACTIVE;
+        subscription.startDate = LocalDateTime.now();
+        subscription.endDate = subscription.startDate.plusMonths(plan.getDurationInMonths());
+        return subscription;
     }
 
     public void renew() {
-        this.endDate = this.endDate.plusMonths(1);
+        this.endDate = this.endDate.plusMonths(plan.getDurationInMonths());
+        this.status = SubscriptionStatus.ACTIVE;
+    }
+
+    public void cancel() {
+        this.status = SubscriptionStatus.CANCELLED;
     }
 
     public boolean isActive() {
-        return LocalDateTime.now().isBefore(endDate);
+        return status == SubscriptionStatus.ACTIVE && LocalDateTime.now().isBefore(endDate);
     }
 }
