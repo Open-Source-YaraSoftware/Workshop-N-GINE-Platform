@@ -1,4 +1,9 @@
 package com.yarasoftware.workshopngine.platform.billing.domain.commands;
 
-public class CreateInvoiceCommand {
-}
+import com.yarasoftware.workshopngine.platform.billing.domain.model.valueobjects.Currency;
+
+public record CreateInvoiceCommand(
+        Long subscriptionId,
+        Integer amount,
+        Currency currency
+) {}

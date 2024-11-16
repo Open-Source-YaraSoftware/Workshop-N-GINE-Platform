@@ -1,4 +1,3 @@
 package com.yarasoftware.workshopngine.platform.billing.domain.queries;
 
-public class GetInvoiceByIdQuery {
-}
+public record GetInvoiceByIdQuery(Long id) {}
