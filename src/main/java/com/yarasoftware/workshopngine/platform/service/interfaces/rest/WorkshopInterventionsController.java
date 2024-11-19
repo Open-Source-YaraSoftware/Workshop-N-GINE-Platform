@@ -35,10 +35,10 @@ public class WorkshopInterventionsController {
     public ResponseEntity<List<InterventionResource>> getAllInterventionsByWorkshopId(@PathVariable Long workshopId, @RequestParam(required = false) Long mechanicLeaderId, @RequestParam(required = false) Long mechanicAssistantId) {
         List<Intervention> interventions;
         if (mechanicLeaderId != null) {
-            var getAllInterventionsByWorkshopAndMechanicLeaderQuery = new GetAllInterventionsByWorkshopAndMechanicLeaderQuery(workshopId, mechanicLeaderId);
+            var getAllInterventionsByWorkshopAndMechanicLeaderQuery = new GetAllInterventionsByWorkshopAndMechanicLeaderQuery(mechanicLeaderId, workshopId);
             interventions = interventionQueryService.handle(getAllInterventionsByWorkshopAndMechanicLeaderQuery);
         } else if (mechanicAssistantId != null) {
-            var getAllInterventionsByWorkshopAndMechanicAssistantQuery = new GetAllInterventionsByWorkshopAndMechanicAssistantQuery(workshopId, mechanicAssistantId);
+            var getAllInterventionsByWorkshopAndMechanicAssistantQuery = new GetAllInterventionsByWorkshopAndMechanicAssistantQuery(mechanicAssistantId, workshopId);
             interventions = interventionQueryService.handle(getAllInterventionsByWorkshopAndMechanicAssistantQuery);
         } else {
             var getAllInterventionsByWorkshopIdQuery = new GetAllInterventionsByWorkshopIdQuery(workshopId);
