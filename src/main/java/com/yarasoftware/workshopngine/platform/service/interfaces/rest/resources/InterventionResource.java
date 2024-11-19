@@ -2,5 +2,5 @@ package com.yarasoftware.workshopngine.platform.service.interfaces.rest.resource
 
 import java.time.LocalDateTime;
 
-public record InterventionResource(Long id, Long vehicleId, Long clientId, Long mechanicLeaderId, String Description, String type, String status, LocalDateTime scheduledDate, LocalDateTime startedAt, LocalDateTime finishedAt) {
+public record InterventionResource(Long id, Long vehicleId, Long clientId, Long mechanicLeaderId, String description, String type, String status, LocalDateTime scheduledAt, LocalDateTime startedAt, LocalDateTime finishedAt) {
 }
