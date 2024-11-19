@@ -1,10 +1,12 @@
 package com.yarasoftware.workshopngine.platform.service.domain.model.aggregates;
 
 import com.yarasoftware.workshopngine.platform.service.domain.model.commands.CreateInterventionCommand;
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.CreateTaskCommand;
 import com.yarasoftware.workshopngine.platform.service.domain.model.commands.UpdateInterventionCommand;
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.UpdateTaskCommand;
+import com.yarasoftware.workshopngine.platform.service.domain.model.entities.Task;
 import com.yarasoftware.workshopngine.platform.service.domain.model.valueobjects.InterventionStatuses;
 import com.yarasoftware.workshopngine.platform.service.domain.model.valueobjects.InterventionTypes;
-import com.yarasoftware.workshopngine.platform.service.domain.model.valueobjects.TaskManager;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -13,6 +15,9 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -47,16 +52,16 @@ public class Intervention extends AbstractAggregateRoot<Intervention> {
 
     private LocalDateTime startedAt;
 
-    private LocalDateTime FinishedAt;
+    private LocalDateTime finishedAt;
 
-    @Embedded
-    private TaskManager taskManager;
+    @OneToMany(mappedBy = "intervention", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    public List<Task> tasks;
 
     public Intervention() {
         this.description = Strings.EMPTY;
         this.type = InterventionTypes.REPARATION;
         this.status = InterventionStatuses.PENDING;
-        this.taskManager = new TaskManager();
+        this.tasks = new ArrayList<>();
     }
 
     public Intervention(CreateInterventionCommand command) {
@@ -69,7 +74,7 @@ public class Intervention extends AbstractAggregateRoot<Intervention> {
         this.scheduledAt = command.scheduledAt();
         this.type = InterventionTypes.REPARATION;
         this.status = InterventionStatuses.PENDING;
-        this.taskManager = new TaskManager();
+        this.tasks = new ArrayList<>();
     }
 
     public void Update(UpdateInterventionCommand command) {
@@ -80,6 +85,80 @@ public class Intervention extends AbstractAggregateRoot<Intervention> {
         this.scheduledAt = command.scheduledAt();
     }
 
+    public Optional<Task> getTaskById(Long taskId) {
+        return tasks
+                .stream()
+                .filter(task -> task.getId().equals(taskId))
+                .findFirst();
+    }
+
+    public List<Task> getAllTasksByAssistantId(Long assistantId) {
+        return tasks
+                .stream()
+                .filter(task -> task.getAssistantId().equals(assistantId))
+                .toList();
+    }
+    
+    public Task addTask(CreateTaskCommand command) {
+        var task = new Task(command, this);
+        tasks.add(task);
+        return task;
+    }
+
+    public Task updateTask(long taskId, UpdateTaskCommand command) {
+        var task = getTaskById(taskId);
+        task.ifPresent(t -> t.update(command));
+        return task.orElse(null);
+    }
+
+    public boolean removeTask(Long taskId) {
+        return tasks.removeIf(task -> task.getId().equals(taskId));
+    }
+
+    public boolean isAllTasksCompleted() {
+        return tasks.stream().allMatch(Task::isCompleted);
+    }
+
+    /**
+     * Methods to change the status of the Intervention
+     */
+    public void start(){
+        if (status != InterventionStatuses.PENDING)
+            throw new IllegalArgumentException("Intervention is not pending");
+        status = InterventionStatuses.IN_PROGRESS;
+        startedAt = LocalDateTime.now();
+    }
+
+    public void complete(){
+        if (!this.IsInProcess())
+            throw new IllegalArgumentException("Intervention is not in progress");
+        if (!isAllTasksCompleted())
+            throw new IllegalArgumentException("Not all tasks are completed");
+        status = InterventionStatuses.COMPLETED;
+        finishedAt = LocalDateTime.now();
+    }
+
+    public void cancel(){
+        if (status != InterventionStatuses.PENDING)
+            throw new IllegalArgumentException("Intervention is not pending");
+        if (status == InterventionStatuses.COMPLETED)
+            throw new IllegalArgumentException("Intervention is already completed");
+        status = InterventionStatuses.CANCELLED;
+    }
+
+    /**
+     * Methods to check the status of the Intervention
+     * @return boolean
+     */
+
+    public boolean IsInProcess() {
+        return status == InterventionStatuses.IN_PROGRESS;
+    }
+
+    /**
+     * Methods to convert the Enum types to String
+     * @return String
+     */
 
     public String TypeToString() {
         return switch (type) {
