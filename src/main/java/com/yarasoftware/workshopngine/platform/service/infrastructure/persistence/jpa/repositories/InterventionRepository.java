@@ -14,4 +14,7 @@ public interface InterventionRepository extends JpaRepository<Intervention, Long
     boolean existsByMechanicLeaderIdAndScheduledAtIsBetween(Long mechanicLeaderId, LocalDateTime start, LocalDateTime end);
     boolean existsByWorkshopIdAndScheduledAtIsBetween(Long workshopId, LocalDateTime start, LocalDateTime end);
     List<Intervention> findAllByVehicleId(Long vehicleId);
+    List<Intervention> findAllByWorkshopId(Long workshopId);
+    List<Intervention> findAllByWorkshopIdAndMechanicLeaderId(Long workshopId, Long mechanicLeaderId);
+    List<Intervention> findAllByWorkshopIdAndMechanicLeaderIdIsNot(Long workshopId, Long mechanicLeaderId);
 }
