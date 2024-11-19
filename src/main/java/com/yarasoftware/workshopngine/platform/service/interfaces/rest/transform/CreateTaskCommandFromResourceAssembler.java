@@ -4,7 +4,7 @@ import com.yarasoftware.workshopngine.platform.service.domain.model.commands.Cre
 import com.yarasoftware.workshopngine.platform.service.interfaces.rest.resources.CreateTaskResource;
 
 public class CreateTaskCommandFromResourceAssembler {
-    public static CreateTaskCommand toCommand(CreateTaskResource resource) {
-        return new CreateTaskCommand(resource.description(), resource.assistantId(), resource.interventionId(), resource.state(), resource.inventoryRequestState());
+    public static CreateTaskCommand ToCommandFromResource(CreateTaskResource resource) {
+        return new CreateTaskCommand(resource.assistantId(), resource.description());
     }
 }

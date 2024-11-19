@@ -1,7 +1,12 @@
 package com.yarasoftware.workshopngine.platform.service.interfaces.rest.resources;
 
-import com.yarasoftware.workshopngine.platform.service.domain.model.valueobjects.InventoryRequestState;
-import com.yarasoftware.workshopngine.platform.service.domain.model.valueobjects.TaskState;
-
-public record UpdateTaskResource(String description, Long assistantId, TaskState state, InventoryRequestState inventoryRequestState) {
+public record UpdateTaskResource(Long assistantId, String description) {
+    public UpdateTaskResource {
+        if (assistantId == null || assistantId <= 0) {
+            throw new IllegalArgumentException("assistantId is required");
+        }
+        if (description == null || description.isBlank()) {
+            throw new IllegalArgumentException("description is required");
+        }
+    }
 }

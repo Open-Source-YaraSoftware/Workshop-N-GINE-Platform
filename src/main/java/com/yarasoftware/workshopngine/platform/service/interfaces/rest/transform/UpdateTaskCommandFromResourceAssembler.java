@@ -4,7 +4,7 @@ import com.yarasoftware.workshopngine.platform.service.domain.model.commands.Upd
 import com.yarasoftware.workshopngine.platform.service.interfaces.rest.resources.UpdateTaskResource;
 
 public class UpdateTaskCommandFromResourceAssembler {
-    public static UpdateTaskCommand toCommand(Long taskId,UpdateTaskResource resource) {
-        return new UpdateTaskCommand(taskId, resource.description(), resource.assistantId(), resource.state(), resource.inventoryRequestState());
+    public static UpdateTaskCommand ToCommandFromResource(UpdateTaskResource resource) {
+        return new UpdateTaskCommand(resource.assistantId(), resource.description());
     }
 }

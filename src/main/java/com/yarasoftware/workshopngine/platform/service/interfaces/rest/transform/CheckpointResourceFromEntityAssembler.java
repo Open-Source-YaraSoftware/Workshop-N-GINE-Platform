@@ -4,11 +4,7 @@ import com.yarasoftware.workshopngine.platform.service.domain.model.entities.Che
 import com.yarasoftware.workshopngine.platform.service.interfaces.rest.resources.CheckpointResource;
 
 public class CheckpointResourceFromEntityAssembler {
-    public static CheckpointResource toResourceFromEntity(Checkpoint checkpoint) {
-        return new CheckpointResource(
-                checkpoint.getId(),
-                checkpoint.getName(),
-                checkpoint.getTask().getId()
-        );
+    public static CheckpointResource ToResourceFromEntity(Checkpoint entity) {
+        return new CheckpointResource(entity.getId(), entity.getName(), entity.getTask().getId());
     }
 }

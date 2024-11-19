@@ -1,9 +1,11 @@
 package com.yarasoftware.workshopngine.platform.service.domain.model.entities;
 
-import com.yarasoftware.workshopngine.platform.service.domain.model.aggregates.Task;
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.CreateCheckpointCommand;
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.UpdateCheckpointCommand;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * Entity representing a Checkpoint within a Task.
@@ -29,20 +31,16 @@ public class Checkpoint {
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;
 
-    /**
-     * Default constructor for JPA.
-     */
     public Checkpoint() {
+        this.name = Strings.EMPTY;
     }
 
-    /**
-     * Constructs a Checkpoint with the specified details.
-     *
-     * @param name the name of the checkpoint
-     * @param task the associated task for this checkpoint
-     */
-    public Checkpoint(String name, Task task) {
-        this.name = name;
+    public Checkpoint(CreateCheckpointCommand command, Task task) {
+        this.name = command.name();
         this.task = task;
+    }
+
+    public void update(UpdateCheckpointCommand command){
+        this.name = command.name();
     }
 }
