@@ -1,7 +1,10 @@
 package com.yarasoftware.workshopngine.platform.service.application.internal.queryservices;
 
 import com.yarasoftware.workshopngine.platform.service.domain.model.aggregates.Intervention;
+import com.yarasoftware.workshopngine.platform.service.domain.model.entities.Task;
 import com.yarasoftware.workshopngine.platform.service.domain.model.queries.GetAllInterventionsByVehicleIdQuery;
+import com.yarasoftware.workshopngine.platform.service.domain.model.queries.GetAllTasksByInterventionIdAndAssistantIdQuery;
+import com.yarasoftware.workshopngine.platform.service.domain.model.queries.GetAllTasksByInterventionIdQuery;
 import com.yarasoftware.workshopngine.platform.service.domain.model.queries.GetInterventionByIdQuery;
 import com.yarasoftware.workshopngine.platform.service.domain.services.InterventionQueryService;
 import com.yarasoftware.workshopngine.platform.service.infrastructure.persistence.jpa.repositories.InterventionRepository;
@@ -26,5 +29,17 @@ public class InterventionQueryServiceImpl implements InterventionQueryService {
     @Override
     public List<Intervention> handle(GetAllInterventionsByVehicleIdQuery query) {
         return interventionRepository.findAllByVehicleId(query.vehicleId());
+    }
+
+    @Override
+    public List<Task> handle(Long interventionId, GetAllTasksByInterventionIdQuery query) {
+        var intervention = interventionRepository.findById(interventionId);
+        return intervention.map(Intervention::getTasks).orElse(List.of());
+    }
+
+    @Override
+    public List<Task> handle(Long interventionId, GetAllTasksByInterventionIdAndAssistantIdQuery query) {
+        var intervention = interventionRepository.findById(interventionId);
+        return intervention.map(i -> i.getAllTasksByAssistantId(query.assistantId())).orElse(List.of());
     }
 }
