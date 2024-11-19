@@ -1,7 +1,8 @@
 package com.yarasoftware.workshopngine.platform.service.interfaces.rest;
 
-import com.yarasoftware.workshopngine.platform.service.domain.model.commands.CreateTaskCommand;
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.CompleteTaskCommand;
 import com.yarasoftware.workshopngine.platform.service.domain.model.commands.DeleteTaskCommand;
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.InProgressTaskCommand;
 import com.yarasoftware.workshopngine.platform.service.domain.model.entities.Task;
 import com.yarasoftware.workshopngine.platform.service.domain.model.queries.GetAllTasksByInterventionIdAndAssistantIdQuery;
 import com.yarasoftware.workshopngine.platform.service.domain.model.queries.GetAllTasksByInterventionIdQuery;
@@ -95,5 +96,31 @@ public class InterventionsTasksController {
         var task = interventionCommandService.handle(interventionId, deleteTaskCommand);
         if (!task) return ResponseEntity.badRequest().build();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/{taskId}/in-progresses")
+    @Operation(summary = "Start a task for an intervention", description = "Start a task for an intervention")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Task was started"),
+            @ApiResponse(responseCode = "400", description = "Task was not started")
+    })
+    public ResponseEntity<Void> startTask(@PathVariable Long interventionId, @PathVariable Long taskId) {
+        var inProgressTaskCommand = new InProgressTaskCommand(taskId);
+        var task = interventionCommandService.handle(interventionId, inProgressTaskCommand);
+        if (task.isEmpty()) return ResponseEntity.badRequest().build();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/{taskId}/confirmations")
+    @Operation(summary = "Complete a task for an intervention", description = "Complete a task for an intervention")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Task was completed"),
+            @ApiResponse(responseCode = "400", description = "Task was not completed")
+    })
+    public ResponseEntity<Void> completeTask(@PathVariable Long interventionId, @PathVariable Long taskId) {
+        var completeTaskCommand = new CompleteTaskCommand(taskId);
+        var task = interventionCommandService.handle(interventionId, completeTaskCommand);
+        if (task.isEmpty()) return ResponseEntity.badRequest().build();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
