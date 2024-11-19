@@ -131,6 +131,10 @@ public class Intervention extends AbstractAggregateRoot<Intervention> {
         task.get().complete();
     }
 
+    public boolean existsTaskByAssistantId(Long assistantId) {
+        return tasks.stream().anyMatch(task -> task.getAssistantId().equals(assistantId));
+    }
+
     /**
      * Methods to manage the Checkpoints
      */
