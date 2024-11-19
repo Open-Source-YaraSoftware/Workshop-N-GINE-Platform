@@ -4,7 +4,6 @@ import com.yarasoftware.workshopngine.platform.inventory.domain.model.commands.D
 import com.yarasoftware.workshopngine.platform.inventory.domain.model.queries.GetAllProductsByWorkshopIdQuery;
 import com.yarasoftware.workshopngine.platform.inventory.domain.services.ProductCommandService;
 import com.yarasoftware.workshopngine.platform.inventory.domain.services.ProductQueryService;
-import com.yarasoftware.workshopngine.platform.inventory.infrastructure.persistence.jpa.repositories.ProductRepository;
 import com.yarasoftware.workshopngine.platform.inventory.interfaces.rest.resources.CreateProductResource;
 import com.yarasoftware.workshopngine.platform.inventory.interfaces.rest.resources.ProductResource;
 import com.yarasoftware.workshopngine.platform.inventory.interfaces.rest.resources.UpdateProductResource;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/v1/products", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Products", description = "Product Management Endpoints")
 public class ProductsController {
     private final ProductCommandService productCommandService;
