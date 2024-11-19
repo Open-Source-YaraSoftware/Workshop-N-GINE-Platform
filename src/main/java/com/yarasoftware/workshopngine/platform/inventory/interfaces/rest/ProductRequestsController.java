@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value="/api/v1/product-requests", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value="/product-requests", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Product Requests", description = "Product Requests Management Endpoints")
 public class ProductRequestsController {
     private final ProductRequestCommandService productRequestCommandService;
