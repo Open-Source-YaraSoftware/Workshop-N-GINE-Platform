@@ -1,8 +1,8 @@
 package com.yarasoftware.workshopngine.platform.service.application.internal.commandservices;
 
 import com.yarasoftware.workshopngine.platform.service.domain.model.aggregates.Intervention;
-import com.yarasoftware.workshopngine.platform.service.domain.model.commands.CreateInterventionCommand;
-import com.yarasoftware.workshopngine.platform.service.domain.model.commands.UpdateInterventionCommand;
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.*;
+import com.yarasoftware.workshopngine.platform.service.domain.model.entities.Task;
 import com.yarasoftware.workshopngine.platform.service.domain.model.valueobjects.InterventionStatuses;
 import com.yarasoftware.workshopngine.platform.service.domain.services.InterventionCommandService;
 import com.yarasoftware.workshopngine.platform.service.infrastructure.persistence.jpa.repositories.InterventionRepository;
@@ -57,6 +57,97 @@ public class InterventionCommandServiceImpl implements InterventionCommandServic
         try {
             interventionRepository.save(intervention.get());
             return intervention;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error saving intervention: %s".formatted(e.getMessage()));
+        }
+    }
+
+    @Override
+    public Optional<Task> handle(Long interventionId, CreateTaskCommand command) {
+        var intervention = interventionRepository.findById(interventionId);
+        if(intervention.isEmpty())
+            throw new IllegalArgumentException("Intervention with id %s not found".formatted(interventionId));
+        if (!intervention.get().IsInProcess())
+            throw new IllegalArgumentException("Intervention with id %s is not in process".formatted(interventionId));
+        var task = intervention.get().addTask(command);
+        try {
+            interventionRepository.save(intervention.get());
+            return Optional.of(task);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error saving task: %s".formatted(e.getMessage()));
+        }
+    }
+
+    @Override
+    public Optional<Task> handle(Long interventionId, Long taskId, UpdateTaskCommand command) {
+        var intervention = interventionRepository.findById(interventionId);
+        if(intervention.isEmpty())
+            throw new IllegalArgumentException("Intervention with id %s not found".formatted(interventionId));
+        if (!intervention.get().IsInProcess())
+            throw new IllegalArgumentException("Intervention with id %s is not in process".formatted(interventionId));
+        var task = intervention.get().updateTask(taskId, command);
+        try {
+            interventionRepository.save(intervention.get());
+            return Optional.of(task);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error saving task: %s".formatted(e.getMessage()));
+        }
+    }
+
+    @Override
+    public boolean handle(Long interventionId, DeleteTaskCommand command) {
+        var intervention = interventionRepository.findById(interventionId);
+        if(intervention.isEmpty())
+            throw new IllegalArgumentException("Intervention with id %s not found".formatted(interventionId));
+        if (!intervention.get().IsInProcess())
+            throw new IllegalArgumentException("Intervention with id %s is not in process".formatted(interventionId));
+        if (!intervention.get().removeTask(command.taskId()))
+            throw new IllegalArgumentException("Task with id %s not found in intervention with id %s".formatted(command.taskId(), interventionId));
+        try {
+            interventionRepository.save(intervention.get());
+            return true;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error saving intervention: %s".formatted(e.getMessage()));
+        }
+    }
+
+    @Override
+    public Optional<Long> handle(InProgressInterventionCommand command) {
+        var intervention = interventionRepository.findById(command.interventionId());
+        if(intervention.isEmpty())
+            throw new IllegalArgumentException("Intervention with id %s not found".formatted(command.interventionId()));
+        intervention.get().start();
+        try {
+            interventionRepository.save(intervention.get());
+            return Optional.of(intervention.get().getId());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error saving intervention: %s".formatted(e.getMessage()));
+        }
+    }
+
+    @Override
+    public Optional<Long> handle(CompleteInterventionCommand command) {
+        var intervention = interventionRepository.findById(command.interventionId());
+        if(intervention.isEmpty())
+            throw new IllegalArgumentException("Intervention with id %s not found".formatted(command.interventionId()));
+        intervention.get().complete();
+        try {
+            interventionRepository.save(intervention.get());
+            return Optional.of(intervention.get().getId());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error saving intervention: %s".formatted(e.getMessage()));
+        }
+    }
+
+    @Override
+    public Optional<Long> handle(CancelInterventionCommand command) {
+        var intervention = interventionRepository.findById(command.interventionId());
+        if(intervention.isEmpty())
+            throw new IllegalArgumentException("Intervention with id %s not found".formatted(command.interventionId()));
+        intervention.get().cancel();
+        try {
+            interventionRepository.save(intervention.get());
+            return Optional.of(intervention.get().getId());
         } catch (Exception e) {
             throw new IllegalArgumentException("Error saving intervention: %s".formatted(e.getMessage()));
         }
