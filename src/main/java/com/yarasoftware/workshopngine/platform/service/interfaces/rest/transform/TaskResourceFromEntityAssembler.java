@@ -4,8 +4,8 @@ import com.yarasoftware.workshopngine.platform.service.domain.model.entities.Tas
 import com.yarasoftware.workshopngine.platform.service.interfaces.rest.resources.TaskResource;
 
 public class TaskResourceFromEntityAssembler {
-    public static TaskResource toResourceFromEntity(Task entity) {
-        return new TaskResource(entity.getId(), entity.getDescription(), entity.getState().name(), entity.getInventoryRequestState().name(), entity.getAssistantId(), entity.getIntervention().getId());
+    public static TaskResource ToResourceFromEntity(Task entity) {
+        return new TaskResource(entity.getId(), entity.getAssistantId(), entity.getDescription(), entity.StatusToString(), entity.getIntervention().getId());
     }
 }
 
