@@ -25,7 +25,7 @@ public class ProductsController {
     private final ProductCommandService productCommandService;
     private final ProductQueryService productQueryService;
 
-    public ProductsController(ProductCommandService productCommandService, ProductQueryService productQueryService, ProductRepository productRepository) {
+    public ProductsController(ProductCommandService productCommandService, ProductQueryService productQueryService) {
         this.productCommandService = productCommandService;
         this.productQueryService = productQueryService;
     }
