@@ -33,7 +33,7 @@ public class ProductRequestsController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductRequestResource>> getAllProductRequests(@RequestParam Long workshopId, @RequestParam Long taskId){
+    public ResponseEntity<List<ProductRequestResource>> getAllProductRequests(@RequestParam(required = false) Long workshopId, @RequestParam(required = false) Long taskId){
 
         List<ProductRequest> productRequests;
         if (workshopId != 0 && !(workshopId <= 0)){
