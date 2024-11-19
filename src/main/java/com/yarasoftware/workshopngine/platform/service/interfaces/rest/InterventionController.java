@@ -1,5 +1,8 @@
 package com.yarasoftware.workshopngine.platform.service.interfaces.rest;
 
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.CancelInterventionCommand;
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.CompleteInterventionCommand;
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.InProgressInterventionCommand;
 import com.yarasoftware.workshopngine.platform.service.domain.model.queries.GetAllInterventionsByVehicleIdQuery;
 import com.yarasoftware.workshopngine.platform.service.domain.model.queries.GetInterventionByIdQuery;
 import com.yarasoftware.workshopngine.platform.service.domain.services.InterventionCommandService;
@@ -90,6 +93,48 @@ public class InterventionController {
         if (intervention.isEmpty()) return ResponseEntity.notFound().build();
         var interventionResource = InterventionResourceFromEntityAssembler.ToResourceFromEntity(intervention.get());
         return new ResponseEntity<>(interventionResource, HttpStatus.OK);
+    }
+
+    @PostMapping("/{interventionId}/in-progresses")
+    @Operation(summary = "Start an intervention", description = "Start an intervention")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Intervention started"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Intervention not found")
+    })
+    public ResponseEntity<?> startIntervention(@PathVariable long interventionId) {
+        var inProgressInterventionCommand = new InProgressInterventionCommand(interventionId);
+        var intervention = interventionCommandService.handle(inProgressInterventionCommand);
+        if (intervention.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{interventionId}/confirmations")
+    @Operation(summary = "Confirm an intervention", description = "Confirm an intervention")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Intervention confirmed"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Intervention not found")
+    })
+    public ResponseEntity<?> confirmIntervention(@PathVariable long interventionId) {
+        var completeInterventionCommand = new CompleteInterventionCommand(interventionId);
+        var intervention = interventionCommandService.handle(completeInterventionCommand);
+        if (intervention.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{interventionId}/cancellations")
+    @Operation(summary = "Cancel an intervention", description = "Cancel an intervention")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Intervention cancelled"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Intervention not found")
+    })
+    public ResponseEntity<?> cancelIntervention(@PathVariable long interventionId) {
+        var cancelInterventionCommand = new CancelInterventionCommand(interventionId);
+        var intervention = interventionCommandService.handle(cancelInterventionCommand);
+        if (intervention.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().build();
     }
 
 }
