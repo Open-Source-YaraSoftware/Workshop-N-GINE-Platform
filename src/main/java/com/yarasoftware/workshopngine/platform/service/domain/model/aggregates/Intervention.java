@@ -1,9 +1,7 @@
 package com.yarasoftware.workshopngine.platform.service.domain.model.aggregates;
 
-import com.yarasoftware.workshopngine.platform.service.domain.model.commands.CreateInterventionCommand;
-import com.yarasoftware.workshopngine.platform.service.domain.model.commands.CreateTaskCommand;
-import com.yarasoftware.workshopngine.platform.service.domain.model.commands.UpdateInterventionCommand;
-import com.yarasoftware.workshopngine.platform.service.domain.model.commands.UpdateTaskCommand;
+import com.yarasoftware.workshopngine.platform.service.domain.model.commands.*;
+import com.yarasoftware.workshopngine.platform.service.domain.model.entities.Checkpoint;
 import com.yarasoftware.workshopngine.platform.service.domain.model.entities.Task;
 import com.yarasoftware.workshopngine.platform.service.domain.model.valueobjects.InterventionStatuses;
 import com.yarasoftware.workshopngine.platform.service.domain.model.valueobjects.InterventionTypes;
@@ -117,6 +115,51 @@ public class Intervention extends AbstractAggregateRoot<Intervention> {
 
     public boolean isAllTasksCompleted() {
         return tasks.stream().allMatch(Task::isCompleted);
+    }
+
+    public void startTask(Long taskId) {
+        var task = getTaskById(taskId);
+        if (task.isEmpty())
+            throw new IllegalArgumentException("Task not found");
+        task.get().start();
+    }
+
+    public void completeTask(Long taskId) {
+        var task = getTaskById(taskId);
+        if (task.isEmpty())
+            throw new IllegalArgumentException("Task not found");
+        task.get().complete();
+    }
+
+    /**
+     * Methods to manage the Checkpoints
+     */
+    public Checkpoint addCheckpoint(Long taskId, CreateCheckpointCommand command) {
+        var task = getTaskById(taskId);
+        if (task.isEmpty())
+            throw new IllegalArgumentException("Task not found");
+        return task.get().addCheckpoint(command);
+    }
+
+    public Checkpoint updateCheckpoint(Long taskId, Long checkpointId, UpdateCheckpointCommand command) {
+        var task = getTaskById(taskId);
+        if (task.isEmpty())
+            throw new IllegalArgumentException("Task not found");
+        return task.get().updateCheckpoint(checkpointId, command);
+    }
+
+    public boolean removeCheckpoint(Long taskId, Long checkpointId) {
+        var task = getTaskById(taskId);
+        if (task.isEmpty())
+            throw new IllegalArgumentException("Task not found");
+        return task.get().removeCheckpoint(checkpointId);
+    }
+
+    public List<Checkpoint> getAllCheckpointsByTaskId(Long taskId) {
+        var task = getTaskById(taskId);
+        if (task.isEmpty())
+            throw new IllegalArgumentException("Task not found");
+        return task.get().getCheckpoints();
     }
 
     /**
