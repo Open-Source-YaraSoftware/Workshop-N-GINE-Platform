@@ -13,6 +13,12 @@ public interface InterventionQueryService {
 
     List<Intervention> handle(GetAllInterventionsByVehicleIdQuery query);
 
+    List<Intervention> handle(GetAllInterventionsByWorkshopIdQuery query);
+
+    List<Intervention> handle(GetAllInterventionsByWorkshopAndMechanicLeaderQuery query);
+
+    List<Intervention> handle(GetAllInterventionsByWorkshopAndMechanicAssistantQuery query);
+
     List<Task> handle(Long interventionId, GetAllTasksByInterventionIdQuery query);
 
     List<Task> handle(Long interventionId, GetAllTasksByInterventionIdAndAssistantIdQuery query);
