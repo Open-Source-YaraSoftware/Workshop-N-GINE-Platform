@@ -4,7 +4,7 @@ import com.yarasoftware.workshopngine.platform.service.domain.model.commands.Cre
 import com.yarasoftware.workshopngine.platform.service.interfaces.rest.resources.CreateCheckpointResource;
 
 public class CreateCheckpointCommandFromResourceAssembler {
-    public static CreateCheckpointCommand toCommand(Long taskId, CreateCheckpointResource resource) {
-        return new CreateCheckpointCommand(taskId, resource.name());
+    public static CreateCheckpointCommand ToCommandFromResource(CreateCheckpointResource resource) {
+        return new CreateCheckpointCommand(resource.name());
     }
 }

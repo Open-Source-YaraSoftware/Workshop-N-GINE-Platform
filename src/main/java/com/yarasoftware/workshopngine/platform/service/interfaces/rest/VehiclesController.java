@@ -31,7 +31,6 @@ public class VehiclesController {
     public ResponseEntity<List<VehicleResource>> getAllVehiclesByClientId(@RequestParam Long clientId){
         var getVehicleByClientIdQuery = new GetAllVehiclesByClientIdQuery(clientId);
         var vehicles = vehicleQueryService.handle(getVehicleByClientIdQuery);
-        if (vehicles.isEmpty()) return ResponseEntity.badRequest().build();
         var vehicleResources = vehicles.stream()
                 .map(VehicleResourceFromEntityAssembler::toResourceFromEntity)
                 .toList();
