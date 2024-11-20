@@ -16,7 +16,9 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOriginPatterns(
                                 "https://open-workshop-n-gine.netlify.app",
-                                "https://workshop-n-gine-platform-production.up.railway.app"
+                                "https://workshop-n-gine-platform-production.up.railway.app",
+                                "http://open-workshop-n-gine.netlify.app",
+                                "http://workshop-n-gine-platform-production.up.railway.app"
                         )
                         .allowedHeaders("*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
