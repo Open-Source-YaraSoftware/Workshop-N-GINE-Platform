@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * AuthenticationController is a class that manages the Authentication Endpoints.
  */
 @RestController
-@RequestMapping(value = "/authentication")
+@RequestMapping(value = "/api/v1/authentication")
 @Tag(name = "Authentication", description = "Authentication Management Endpoints")
 public class AuthenticationController {
     private final UserCommandService userCommandService;

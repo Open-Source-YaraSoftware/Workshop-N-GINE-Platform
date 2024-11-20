@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/workshops/{workshopId}/interventions")
+@RequestMapping("/api/v1/workshops/{workshopId}/interventions")
 @Tag(name = "Workshops", description = "Available Workshop Endpoints")
 public class WorkshopInterventionsController {
     private final InterventionQueryService interventionQueryService;
