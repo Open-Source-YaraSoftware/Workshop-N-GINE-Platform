@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/workshops")
+@RequestMapping(value = "/api/v1/workshops")
 @Tag(name = "Workshops", description = "Available Workshop Endpoints")
 public class WorkshopController {
     private final WorkshopQueryService workshopQueryService;

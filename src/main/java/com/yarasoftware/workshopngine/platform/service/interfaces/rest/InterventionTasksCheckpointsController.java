@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/interventions/{interventionId}/tasks/{taskId}/checkpoints")
+@RequestMapping("/api/v1/interventions/{interventionId}/tasks/{taskId}/checkpoints")
 @Tag(name = "Interventions", description = "Available Intervention Endpoints")
 
 public class InterventionTasksCheckpointsController {
