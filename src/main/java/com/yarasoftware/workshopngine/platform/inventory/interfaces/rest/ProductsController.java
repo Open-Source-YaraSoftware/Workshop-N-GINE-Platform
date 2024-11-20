@@ -35,7 +35,6 @@ public class ProductsController {
         if (workshopId <= 0) return ResponseEntity.badRequest().build();
         var getAllProductsByWorkshopIdQuery = new GetAllProductsByWorkshopIdQuery(workshopId);
         var products = productQueryService.handle(getAllProductsByWorkshopIdQuery);
-        if (products.isEmpty()) return ResponseEntity.badRequest().build();
         var resources = products.stream()
                 .map(ProductResourceFromEntityAssembler::toResourceFromEntity)
                 .toList();
