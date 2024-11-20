@@ -71,7 +71,7 @@ public class ProfilesController {
      *         {@code 404 Not Found} if no profile matches the criteria;
      *         or {@code 400 Bad Request} if neither parameter is provided or if userId is invalid.
      */
-    @GetMapping("/profiles")
+    @GetMapping
     public ResponseEntity<ProfileResource> getProfile(@RequestParam(required = false) Integer dni, @RequestParam(required = false) Long userId) {
         if (dni != null) {
             var getProfileByDniQuery = new GetProfileByDniQuery(dni);
