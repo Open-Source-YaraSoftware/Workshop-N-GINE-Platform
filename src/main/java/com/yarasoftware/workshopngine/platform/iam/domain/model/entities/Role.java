@@ -4,6 +4,8 @@ import com.yarasoftware.workshopngine.platform.iam.domain.model.valueobjects.Rol
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 /**
  * Role entity
  * @version 1.0
@@ -20,7 +22,7 @@ public class Role {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(nullable = false, unique = true, length = 20)
     private Roles name;
 
     public Role(Roles name) { this.name = name; }
@@ -33,7 +35,14 @@ public class Role {
         return new Role(Roles.valueOf(name));
     }
 
-    public static Role toRoleFromId(Long id) {
-        return new Role(id, null);
+    public static Role getDefaultRole() {
+        return new Role(Roles.ROLE_WORKSHOP_OWNER);
+    }
+
+    public static List<Role> validateRoleSet(List<Role> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return List.of(getDefaultRole());
+        }
+        return roles;
     }
 }
