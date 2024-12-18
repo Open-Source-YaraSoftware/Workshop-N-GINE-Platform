@@ -30,13 +30,17 @@ public class IamApplicationReadyEventHandler {
     /**
      * Load roles data
      * This method is used to seed roles to the database.
-     * @param event
+     * @param event The ApplicationReadyEvent
      */
     private void loadRolesData(ApplicationReadyEvent event) {
-        var name = event.getApplicationContext().getId();
-        LOGGER.info("Starting to seed roles for {} at {}", name, new Timestamp(System.currentTimeMillis()));
+        var applicationName = event.getApplicationContext().getId();
+        LOGGER.info("Starting to verify if roles seeding is needed for {} at {}", applicationName, getCurrentTimestamp());
         var seedRolesCommand = new SeedRolesCommand();
         roleCommandService.handle(seedRolesCommand);
-        LOGGER.info("Roles seeded successfully for {} at {}", name, new Timestamp(System.currentTimeMillis()));
+        LOGGER.info("Roles seeding verification finished for {} at {}", applicationName, getCurrentTimestamp());
+    }
+
+    private Timestamp getCurrentTimestamp() {
+        return new Timestamp(System.currentTimeMillis());
     }
 }

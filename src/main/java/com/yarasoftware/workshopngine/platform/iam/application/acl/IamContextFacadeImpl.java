@@ -64,21 +64,24 @@ public class IamContextFacadeImpl implements IamContextFacade {
     @Override
     public Long createUser(String username, String password, Long roleId, Long workshopId) {
         var role = roleRepository.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found"));
-        var createUserCommand = new CreateUserCommand(username, password, role, workshopId);
+        var roleList = List.of(role);
+        var createUserCommand = new CreateUserCommand(username, password, roleList, workshopId);
         return userCommandService.handle(createUserCommand);
     }
 
     @Override
     public Long createUserWithRoleMechanic(String username, String password, Long workshopId) {
-        var role = roleRepository.findByName(Roles.MECHANIC).orElseThrow(() -> new RuntimeException("Role not found"));
-        var createUserCommand = new CreateUserCommand(username, password, role, workshopId);
+        var role = roleRepository.findByName(Roles.ROLE_MECHANIC).orElseThrow(() -> new RuntimeException("Role not found"));
+        var roleList = List.of(role);
+        var createUserCommand = new CreateUserCommand(username, password, roleList, workshopId);
         return userCommandService.handle(createUserCommand);
     }
 
     @Override
     public Long createUserWithRoleClient(String username, String password, Long workshopId) {
-        var role = roleRepository.findByName(Roles.CLIENT).orElseThrow(() -> new RuntimeException("Role not found"));
-        var createUserCommand = new CreateUserCommand(username, password, role, workshopId);
+        var role = roleRepository.findByName(Roles.ROLE_CLIENT).orElseThrow(() -> new RuntimeException("Role not found"));
+        var roleList = List.of(role);
+        var createUserCommand = new CreateUserCommand(username, password, roleList, workshopId);
         return userCommandService.handle(createUserCommand);
     }
 }

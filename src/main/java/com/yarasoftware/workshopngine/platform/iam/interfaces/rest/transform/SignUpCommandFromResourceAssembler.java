@@ -4,6 +4,8 @@ import com.yarasoftware.workshopngine.platform.iam.domain.model.commands.SignUpC
 import com.yarasoftware.workshopngine.platform.iam.domain.model.entities.Role;
 import com.yarasoftware.workshopngine.platform.iam.interfaces.rest.resources.SignUpResource;
 
+import java.util.ArrayList;
+
 /**
  * SignUpCommandFromResourceAssembler is a class that assembles the SignUpCommand from the SignUpResource.
  */
@@ -14,7 +16,10 @@ public class SignUpCommandFromResourceAssembler {
      * @return the SignUpCommand
      */
     public static SignUpCommand toCommandFromResource(SignUpResource signUpResource) {
-        var role = Role.toRoleFromId(signUpResource.roleId());
-        return new SignUpCommand(signUpResource.username(), signUpResource.password(), role, signUpResource.workshopId());
+        var roles = signUpResource.roles() != null
+                ? signUpResource.roles().stream().map(Role::toRoleFromName).toList()
+                : new ArrayList<Role>();
+        System.out.println("roles: " + roles);
+        return new SignUpCommand(signUpResource.username(), signUpResource.password(), roles, signUpResource.workshopId());
     }
 }

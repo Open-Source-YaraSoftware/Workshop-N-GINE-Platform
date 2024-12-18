@@ -5,6 +5,11 @@ import com.yarasoftware.workshopngine.platform.iam.interfaces.rest.resources.Use
 
 public class UserResourceFromEntityAssembler {
     public static UserResource toResourceFromEntity(User user) {
-        return new UserResource(user.getId(), user.getUsername(), user.getRole().getId(), user.getWorkshopId(), user.getStatus());
+        return new UserResource(
+                user.getId(),
+                user.getUsername(),
+                user.getRoles().stream().map(role -> role.getName().name()).toList(),
+                user.getWorkshopId(),
+                user.getStatus());
     }
 }

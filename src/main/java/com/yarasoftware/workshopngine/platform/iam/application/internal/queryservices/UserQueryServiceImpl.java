@@ -27,19 +27,19 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     @Override
     public List<User> handle(GetAllUsersByWorkshopAndRoleIsOwnerQuery query) {
-        var role = roleRepository.findByName(Roles.WORKSHOP_OWNER).orElseThrow( () -> new RuntimeException("Role not found"));
-        return userRepository.findAllByWorkshopIdAndRoleIs(query.workshopId(), role);
+        var role = roleRepository.findByName(Roles.ROLE_WORKSHOP_OWNER).orElseThrow( () -> new RuntimeException("Role not found"));
+        return userRepository.findAllByWorkshopIdAndRolesContains(query.workshopId(), role);
     }
 
     @Override
     public List<User> handle(GetAllUsersByWorkshopAndRoleIsClientQuery query) {
-        var role = roleRepository.findByName(Roles.CLIENT).orElseThrow( () -> new RuntimeException("Role not found"));
-        return userRepository.findAllByWorkshopIdAndRoleIs(query.workshopId(), role);
+        var role = roleRepository.findByName(Roles.ROLE_CLIENT).orElseThrow( () -> new RuntimeException("Role not found"));
+        return userRepository.findAllByWorkshopIdAndRolesContains(query.workshopId(), role);
     }
 
     @Override
     public List<User> handle(GetAllUsersByWorkshopAndRoleIsMechanicQuery query) {
-        var role = roleRepository.findByName(Roles.MECHANIC).orElseThrow( () -> new RuntimeException("Role not found"));
-        return userRepository.findAllByWorkshopIdAndRoleIs(query.workshopId(), role);
+        var role = roleRepository.findByName(Roles.ROLE_MECHANIC).orElseThrow( () -> new RuntimeException("Role not found"));
+        return userRepository.findAllByWorkshopIdAndRolesContains(query.workshopId(), role);
     }
 }
