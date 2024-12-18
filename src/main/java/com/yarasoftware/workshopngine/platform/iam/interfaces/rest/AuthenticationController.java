@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * AuthenticationController is a class that manages the Authentication Endpoints.
  */
 @RestController
-@RequestMapping(value = "/api/v1/authentication")
+@RequestMapping(value = "/api/v1/authentication", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Authentication", description = "Authentication Management Endpoints")
 public class AuthenticationController {
     private final UserCommandService userCommandService;
@@ -52,7 +53,7 @@ public class AuthenticationController {
         var signInCommand = SignInCommandFromResourceAssembler.toCommandFromResource(signInResource);
         var user = userCommandService.handle(signInCommand);
         if (user.isEmpty()) return ResponseEntity.notFound().build();
-        var authenticateUserResource = AuthenticateUserResourceFromEntityAssembler.toResourceFromEntity(user.get());
+        var authenticateUserResource = AuthenticateUserResourceFromEntityAssembler.toResourceFromEntity(user.get().getLeft(), user.get().getRight());
         return ResponseEntity.ok(authenticateUserResource);
     }
 
