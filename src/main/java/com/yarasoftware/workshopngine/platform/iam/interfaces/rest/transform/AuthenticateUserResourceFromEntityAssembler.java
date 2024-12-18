@@ -11,7 +11,13 @@ public class AuthenticateUserResourceFromEntityAssembler {
      * @param user the user entity
      * @return the AuthenticateUserResource
      */
-    public static AuthenticateUserResource toResourceFromEntity(User user) {
-        return new AuthenticateUserResource(user.getId(), user.getUsername(), user.getRole().getId(), user.getWorkshopId());
+    public static AuthenticateUserResource toResourceFromEntity(User user, String token) {
+        return new AuthenticateUserResource(
+                user.getId(),
+                user.getUsername(),
+                user.getRoles().stream().map(role -> role.getName().name()).toList(),
+                user.getWorkshopId(),
+                token
+        );
     }
 }

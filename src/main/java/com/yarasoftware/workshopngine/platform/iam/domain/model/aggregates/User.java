@@ -8,6 +8,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * User entity
  * @summary
@@ -31,10 +35,11 @@ public class User extends AbstractAggregateRoot<User> {
     @NotBlank
     private String password;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id",referencedColumnName = "id")
-    private Role role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
 
     @NotNull
     @Positive
@@ -44,18 +49,21 @@ public class User extends AbstractAggregateRoot<User> {
     private AccountStatuses status;
 
     public User() {
+        this.roles = new HashSet<>();
     }
 
     public User(String username, String password) {
+        this();
         this.username = username;
         this.password = password;
     }
 
-    public User(String username, String password, Role role, Long workshopId) {
+    public User(String username, String password, List<Role> roles, Long workshopId) {
+        this();
         this.username = username;
         this.password = password;
-        this.role = role;
         this.workshopId = workshopId;
+        addRoles(roles);
         this.status = AccountStatuses.ACTIVE;
     }
 
@@ -65,5 +73,15 @@ public class User extends AbstractAggregateRoot<User> {
      */
     public String getStatus() {
         return status.name();
+    }
+
+    public User addRole(Role role) {
+        this.roles.add(role);
+        return this;
+    }
+
+    public void addRoles(List<Role> roles) {
+        var validatedRoleSet = Role.validateRoleSet(roles);
+        this.roles.addAll(validatedRoleSet);
     }
 }
