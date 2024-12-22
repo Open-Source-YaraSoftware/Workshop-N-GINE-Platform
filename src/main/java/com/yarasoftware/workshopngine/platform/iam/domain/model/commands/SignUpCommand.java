@@ -6,16 +6,14 @@ import java.util.List;
 /**
  * Command to sign up a new user
  */
-public record SignUpCommand(String username, String password, List<Role> roles, Long workshopId) {
+public record SignUpCommand(String username, String password, List<Role> roles) {
     /**
      * Constructor
-     * @param username The username
+     * @param username The email
      *                 (cannot be null or empty)
      * @param password The password
      *                 (cannot be null or empty)
      * @param roles The roles
-     *                 (cannot be null)
-     * @param workshopId The workshop ID
      *                 (cannot be null)
      */
     public SignUpCommand {
@@ -27,9 +25,6 @@ public record SignUpCommand(String username, String password, List<Role> roles, 
         }
         if (roles.isEmpty()) {
             throw new IllegalArgumentException("Roles cannot be null or empty");
-        }
-        if (workshopId == null) {
-            throw new IllegalArgumentException("Workshop ID cannot be null");
         }
     }
 }

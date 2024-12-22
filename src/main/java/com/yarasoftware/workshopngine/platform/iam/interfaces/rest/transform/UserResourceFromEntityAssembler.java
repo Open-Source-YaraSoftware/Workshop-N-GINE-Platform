@@ -7,9 +7,9 @@ public class UserResourceFromEntityAssembler {
     public static UserResource toResourceFromEntity(User user) {
         return new UserResource(
                 user.getId(),
-                user.getUsername(),
+                user.getEmail(),
                 user.getRoles().stream().map(role -> role.getName().name()).toList(),
-                user.getWorkshopId(),
-                user.getStatus());
+                user.isEnabled()
+        );
     }
 }

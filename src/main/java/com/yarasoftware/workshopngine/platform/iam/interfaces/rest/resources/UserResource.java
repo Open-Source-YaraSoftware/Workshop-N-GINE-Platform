@@ -5,5 +5,5 @@ import java.util.List;
 /**
  * UserResource is a record class that represents the user resource.
  */
-public record UserResource(Long id, String username, List<String> roles, Long workshopId, String status) {
+public record UserResource(Long id, String email, List<String> roles, boolean enabled) {
 }

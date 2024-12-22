@@ -9,18 +9,15 @@ import java.util.List;
  * @param username
  * @param password
  * @param roles
- * @param workshopId
  */
-public record CreateUserCommand(String username, String password, List<Role> roles, Long workshopId) {
+public record CreateUserCommand(String username, String password, List<Role> roles) {
     /**
      * Constructor
-     * @param username The username
+     * @param username The email
      *                 (cannot be null or empty)
      * @param password The password
      *                 (cannot be null or empty)
      * @param roles The roles
-     *                 (cannot be null)
-     * @param workshopId The workshop ID
      *                 (cannot be null)
      *
      */
@@ -33,9 +30,6 @@ public record CreateUserCommand(String username, String password, List<Role> rol
         }
         if (roles == null || roles.isEmpty()) {
             throw new IllegalArgumentException("Roles cannot be null or empty");
-        }
-        if (workshopId == null) {
-            throw new IllegalArgumentException("Workshop ID cannot be null");
         }
     }
 }
