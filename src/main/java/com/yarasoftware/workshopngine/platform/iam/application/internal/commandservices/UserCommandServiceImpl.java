@@ -38,17 +38,17 @@ public class UserCommandServiceImpl implements UserCommandService {
     // TODO: Delete this method if not needed
     @Override
     public Optional<User> handle(SignUpCommand command) {
-        if (userRepository.existsByUsername(command.username()))
+        if (userRepository.existsByEmail(command.username()))
             throw new RuntimeException("Username already exists");
         var roles = command.roles();
         if (roles.isEmpty()) {
-            var role = roleRepository.findByName(Roles.ROLE_WORKSHOP_OWNER);
+            var role = roleRepository.findByName(Roles.ROLE_USER);
             if (role.isPresent()) roles.add(role.get());
         } else roles = roles.stream().map(role -> roleRepository.findByName(role.getName())
                 .orElseThrow(() -> new RuntimeException("Role not found"))).toList();
-        var user = new User(command.username(), hashingService.encode(command.password()), roles, command.workshopId());
+        var user = new User(command.username(), hashingService.encode(command.password()), roles);
         userRepository.save(user);
-        return userRepository.findByUsername(command.username());
+        return userRepository.findByEmail(command.username());
     }
 
     /**
@@ -56,17 +56,17 @@ public class UserCommandServiceImpl implements UserCommandService {
      */
     @Override
     public Optional<ImmutablePair<User, String>> handle(SignInCommand command) {
-        var user = userRepository.findByUsername(command.username());
-        if (user.isEmpty()) throw new RuntimeException("User " + command.username() + " found");
+        var user = userRepository.findByEmail(command.email());
+        if (user.isEmpty()) throw new RuntimeException("User " + command.email() + " found");
         if (!hashingService.matches(command.password(), user.get().getPassword()))
             throw new RuntimeException("Invalid password");
-        var token = tokenService.generateToken(user.get().getUsername());
+        var token = tokenService.generateToken(user.get().getEmail());
         return Optional.of(new ImmutablePair<>(user.get(), token));
     }
 
     @Override
     public Long handle(CreateUserCommand command) {
-        if (userRepository.existsByUsername(command.username()))
+        if (userRepository.existsByEmail(command.username()))
             throw new RuntimeException("User " + command.username() + " already exists");
         if (command.roles().isEmpty()) {
             throw new RuntimeException("User " + command.username() + " must have at least one role");
@@ -74,7 +74,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         var roles = command.roles().stream().map(role -> roleRepository.findByName(role.getName())
                 .orElseThrow(() -> new RuntimeException("Role not found"))).toList();
 
-        var user = new User(command.username(), command.password(), roles, command.workshopId());
+        var user = new User(command.username(), command.password(), roles);
         userRepository.save(user);
         return user.getId();
     }
