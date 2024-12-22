@@ -36,7 +36,7 @@ public class Role {
     }
 
     public static Role getDefaultRole() {
-        return new Role(Roles.ROLE_WORKSHOP_OWNER);
+        return new Role(Roles.ROLE_USER);
     }
 
     public static List<Role> validateRoleSet(List<Role> roles) {
