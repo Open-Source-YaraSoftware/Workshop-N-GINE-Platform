@@ -1,11 +1,14 @@
 package com.yarasoftware.workshopngine.platform.iam.domain.model.aggregates;
 
+import com.yarasoftware.workshopngine.platform.iam.domain.model.entities.Provider;
 import com.yarasoftware.workshopngine.platform.iam.domain.model.entities.Role;
-import com.yarasoftware.workshopngine.platform.iam.domain.model.valueobjects.AccountStatuses;
+import com.yarasoftware.workshopngine.platform.iam.domain.model.valueobjects.AuthProviders;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
+import org.checkerframework.common.aliasing.qual.Unique;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.util.HashSet;
@@ -27,12 +30,9 @@ public class User extends AbstractAggregateRoot<User> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 50)
-    @Column(unique = true)
-    private String username;
+    @Unique
+    private String email;
 
-    @NotBlank
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -42,46 +42,57 @@ public class User extends AbstractAggregateRoot<User> {
     private Set<Role> roles;
 
     @NotNull
-    @Positive
-    private Long workshopId;
+    private boolean enabled;
 
-    @NotNull
-    private AccountStatuses status;
+    @Embedded
+    private Provider authProvider;
 
     public User() {
+        this.password = Strings.EMPTY;
         this.roles = new HashSet<>();
+        this.enabled = false;
+        this.authProvider = new Provider();
     }
 
-    public User(String username, String password) {
+    public User(String email, String password) {
         this();
-        this.username = username;
+        this.email = email;
         this.password = password;
     }
 
-    public User(String username, String password, List<Role> roles, Long workshopId) {
+    public User(String email, String password, List<Role> roles) {
         this();
-        this.username = username;
+        this.email = email;
         this.password = password;
-        this.workshopId = workshopId;
         addRoles(roles);
-        this.status = AccountStatuses.ACTIVE;
     }
 
-    /**
-     * Get the status of the user
-     * @return the status of the user
-     */
-    public String getStatus() {
-        return status.name();
-    }
-
-    public User addRole(Role role) {
+    public void addRole(Role role) {
         this.roles.add(role);
-        return this;
     }
 
     public void addRoles(List<Role> roles) {
         var validatedRoleSet = Role.validateRoleSet(roles);
         this.roles.addAll(validatedRoleSet);
+    }
+
+    public void activateAccount() {
+        this.enabled = true;
+    }
+
+    public void deactivateAccount() {
+        this.enabled = false;
+    }
+
+    public void useGoogleAsExternalAuthProvider() {
+        this.authProvider.setProviderName(AuthProviders.GOOGLE);
+    }
+
+    public void useGithubAsExternalAuthProvider() {
+        this.authProvider.setProviderName(AuthProviders.GITHUB);
+    }
+
+    public void updateProviderUserId(String providerUserId) {
+        this.authProvider.setProviderUserId(providerUserId);
     }
 }
