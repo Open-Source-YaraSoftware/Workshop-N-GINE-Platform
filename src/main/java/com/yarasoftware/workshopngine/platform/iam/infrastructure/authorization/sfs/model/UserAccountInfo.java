@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Data
 @Builder
-public class UserInfo {
+public class UserAccountInfo {
     private String name;
     private String firstName;
     private String lastName;
