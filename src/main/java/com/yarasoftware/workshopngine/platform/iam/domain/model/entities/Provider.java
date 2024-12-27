@@ -19,4 +19,17 @@ public class Provider {
         this.providerName = AuthProviders.LOCAL;
         this.providerUserId = "";
     }
+
+    public Provider(String providerUserId, String providerName) {
+        this.providerUserId = providerUserId;
+        this.providerName = verifyProviderName(providerName);
+    }
+
+    private AuthProviders verifyProviderName(String providerName) {
+        try {
+            return AuthProviders.valueOf(providerName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Provider not supported: " + providerName);
+        }
+    }
 }
