@@ -2,11 +2,9 @@ package com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization
 
 import com.yarasoftware.workshopngine.platform.iam.domain.model.aggregates.User;
 import com.yarasoftware.workshopngine.platform.iam.domain.model.entities.Provider;
-import com.yarasoftware.workshopngine.platform.iam.domain.model.entities.Role;
 import com.yarasoftware.workshopngine.platform.iam.domain.model.valueobjects.AuthProviders;
-import com.yarasoftware.workshopngine.platform.iam.domain.model.valueobjects.Roles;
+import com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.interfaces.UserRegistration;
 import com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.model.UserAccountInfo;
-import com.yarasoftware.workshopngine.platform.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
 import com.yarasoftware.workshopngine.platform.iam.infrastructure.persistence.jpa.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -21,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final UserRegistration userRegistration;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -29,26 +27,9 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         Provider provider = new Provider(oAuth2User.getName().toString(), userRequest.getClientRegistration().getRegistrationId());
         UserAccountInfo userAccountInfo = processOAuth2User(oAuth2User, provider);
         Optional<User> userOptional = userRepository.findByAuthProvider(provider);
-        userOptional.map(existingUser->updateExistingUser(existingUser, userAccountInfo))
-                .orElseGet(() -> registerUser(userAccountInfo, provider));
+        userOptional.map(existingUser-> userRegistration.updateExistingUser(existingUser, userAccountInfo))
+                .orElseGet(() -> userRegistration.registerUser(userAccountInfo, provider));
         return oAuth2User;
-    }
-
-    private User registerUser(UserAccountInfo userAccountInfo, Provider provider) {
-        User user = new User();
-        user.setUsername(userAccountInfo.getNickname());
-        user.setEmail(userAccountInfo.getEmail());
-        user.activateAccount();
-        user.setAuthProvider(provider);
-        Role defaultRole = roleRepository.findByName(Roles.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Default role not found"));
-        user.addRole(defaultRole);
-        return userRepository.save(user);
-    }
-
-    private User updateExistingUser(User existingUser, UserAccountInfo userAccountInfo) {
-        existingUser.setUsername(userAccountInfo.getNickname());
-        return userRepository.save(existingUser);
     }
 
     private UserAccountInfo processOAuth2User(OAuth2User oAuth2User, Provider provider) {
