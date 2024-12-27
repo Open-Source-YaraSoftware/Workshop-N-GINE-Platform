@@ -1,7 +1,9 @@
-package com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.handlers;
+package com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.pipeline;
 
+import com.yarasoftware.workshopngine.platform.iam.domain.model.aggregates.User;
+import com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.resources.AuthenticationUserResource;
+import com.yarasoftware.workshopngine.platform.iam.infrastructure.persistence.jpa.repositories.UserRepository;
 import com.yarasoftware.workshopngine.platform.iam.infrastructure.tokens.jwt.BearerTokenService;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,24 +14,32 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class AuthenticationSuccessTokenHandler implements AuthenticationSuccessHandler {
     private final BearerTokenService tokenService;
+    private final UserRepository userRepository;
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
             HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
+            Authentication authentication) throws IOException{
 
         String username = extractUsername(authentication);
         if (username == null) {
             sendErrorResponse(response);
             return;
         }
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            sendErrorResponse(response);
+            return;
+        }
         String token = tokenService.generateToken(username);
-        sendSuccessResponse(response, token);
+        AuthenticationUserResource resource = new AuthenticationUserResource(user.get().getId(), username, token);
+        sendSuccessResponse(response, resource);
     }
 
     private String extractUsername(Authentication authentication) {
@@ -50,9 +60,9 @@ public class AuthenticationSuccessTokenHandler implements AuthenticationSuccessH
         return oidcUser.getAttribute("name");
     }
 
-    private void sendSuccessResponse(HttpServletResponse response, String token) throws IOException {
+    private void sendSuccessResponse(HttpServletResponse response, AuthenticationUserResource resource) throws IOException {
         response.setContentType("application/json");
-        response.getWriter().write("{\"token\":\"" + token + "\"}");
+        response.getWriter().write("{\"id\":\"" + resource.id() + "\",\"username\":\"" + resource.username() + "\",\"token\":\"" + resource.token() + "\"}");
     }
 
     private void sendErrorResponse(HttpServletResponse response) throws IOException {
