@@ -15,8 +15,8 @@ public class AuthenticateUserResourceFromEntityAssembler {
         return new AuthenticateUserResource(
                 user.getId(),
                 user.getUsername(),
+                user.getEmail(),
                 user.getRoles().stream().map(role -> role.getName().name()).toList(),
-                user.getWorkshopId(),
                 token
         );
     }

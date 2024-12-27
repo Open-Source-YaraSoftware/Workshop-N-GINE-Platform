@@ -13,6 +13,6 @@ public class SignInCommandFromResourceAssembler {
      * @return the SignInCommand
      */
     public static SignInCommand toCommandFromResource(SignInResource signInResource) {
-        return new SignInCommand(signInResource.username(), signInResource.password());
+        return new SignInCommand(signInResource.email(), signInResource.password());
     }
 }

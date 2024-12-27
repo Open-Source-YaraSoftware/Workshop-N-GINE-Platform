@@ -10,9 +10,9 @@ public class UsernamePasswordAuthenticationTokenBuilder {
         var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 principal,
                 null,
-                principal.getAuthorities());
-        usernamePasswordAuthenticationToken.setDetails(
-                new WebAuthenticationDetailsSource().buildDetails(request));
+                principal.getAuthorities()
+        );
+        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         return usernamePasswordAuthenticationToken;
     }
 }
