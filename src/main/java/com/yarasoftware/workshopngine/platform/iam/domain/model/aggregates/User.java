@@ -31,6 +31,9 @@ public class User extends AbstractAggregateRoot<User> {
     private Long id;
 
     @Unique
+    private String username;
+
+    @Unique
     private String email;
 
     private String password;
@@ -48,6 +51,8 @@ public class User extends AbstractAggregateRoot<User> {
     private Provider authProvider;
 
     public User() {
+        this.username = Strings.EMPTY;
+        this.email = Strings.EMPTY;
         this.password = Strings.EMPTY;
         this.roles = new HashSet<>();
         this.enabled = false;
@@ -60,8 +65,9 @@ public class User extends AbstractAggregateRoot<User> {
         this.password = password;
     }
 
-    public User(String email, String password, List<Role> roles) {
+    public User(String username, String email, String password, List<Role> roles) {
         this();
+        this.username = username;
         this.email = email;
         this.password = password;
         addRoles(roles);

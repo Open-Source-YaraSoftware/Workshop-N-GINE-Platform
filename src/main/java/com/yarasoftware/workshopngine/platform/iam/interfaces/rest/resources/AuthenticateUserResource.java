@@ -5,5 +5,5 @@ import java.util.List;
 /**
  * AuthenticateUserResource is a record class that represents the user authentication resource.
  */
-public record AuthenticateUserResource(Long id, String email, List<String> roles, String token) {
+public record AuthenticateUserResource(Long id, String username, String email, List<String> roles, String token) {
 }

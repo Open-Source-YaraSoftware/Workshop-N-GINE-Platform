@@ -55,7 +55,7 @@ public class IamContextFacadeImpl implements IamContextFacade {
 
     /**
      * Create a user.
-     * @param username the username.
+     * @param username the email.
      * @param password the password.
      * @param roleId the role id.
      * @param workshopId the workshop id.
@@ -65,23 +65,23 @@ public class IamContextFacadeImpl implements IamContextFacade {
     public Long createUser(String username, String password, Long roleId, Long workshopId) {
         var role = roleRepository.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found"));
         var roleList = List.of(role);
-        var createUserCommand = new CreateUserCommand(username, password, roleList, workshopId);
+        var createUserCommand = new CreateUserCommand(username, username, password, roleList);
         return userCommandService.handle(createUserCommand);
     }
 
     @Override
     public Long createUserWithRoleMechanic(String username, String password, Long workshopId) {
-        var role = roleRepository.findByName(Roles.ROLE_MECHANIC).orElseThrow(() -> new RuntimeException("Role not found"));
+        var role = roleRepository.findByName(Roles.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Role not found"));
         var roleList = List.of(role);
-        var createUserCommand = new CreateUserCommand(username, password, roleList, workshopId);
+        var createUserCommand = new CreateUserCommand(username, username, password, roleList);
         return userCommandService.handle(createUserCommand);
     }
 
     @Override
     public Long createUserWithRoleClient(String username, String password, Long workshopId) {
-        var role = roleRepository.findByName(Roles.ROLE_CLIENT).orElseThrow(() -> new RuntimeException("Role not found"));
+        var role = roleRepository.findByName(Roles.ROLE_GUEST).orElseThrow(() -> new RuntimeException("Role not found"));
         var roleList = List.of(role);
-        var createUserCommand = new CreateUserCommand(username, password, roleList, workshopId);
+        var createUserCommand = new CreateUserCommand(username, username, password, roleList);
         return userCommandService.handle(createUserCommand);
     }
 }

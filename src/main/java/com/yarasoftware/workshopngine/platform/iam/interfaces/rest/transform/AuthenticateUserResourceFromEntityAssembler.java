@@ -14,6 +14,7 @@ public class AuthenticateUserResourceFromEntityAssembler {
     public static AuthenticateUserResource toResourceFromEntity(User user, String token) {
         return new AuthenticateUserResource(
                 user.getId(),
+                user.getUsername(),
                 user.getEmail(),
                 user.getRoles().stream().map(role -> role.getName().name()).toList(),
                 token

@@ -38,17 +38,19 @@ public class UserCommandServiceImpl implements UserCommandService {
     // TODO: Delete this method if not needed
     @Override
     public Optional<User> handle(SignUpCommand command) {
-        if (userRepository.existsByEmail(command.username()))
-            throw new RuntimeException("Username already exists");
+        if (userRepository.existsByEmail(command.email()))
+            throw new RuntimeException("User " + command.email() + " already exists");
+        if (userRepository.existsByUsername(command.username()))
+            throw new RuntimeException("User " + command.username() + " already exists");
         var roles = command.roles();
         if (roles.isEmpty()) {
             var role = roleRepository.findByName(Roles.ROLE_USER);
             if (role.isPresent()) roles.add(role.get());
         } else roles = roles.stream().map(role -> roleRepository.findByName(role.getName())
                 .orElseThrow(() -> new RuntimeException("Role not found"))).toList();
-        var user = new User(command.username(), hashingService.encode(command.password()), roles);
+        var user = new User(command.username(), command.email(), hashingService.encode(command.password()), roles);
         userRepository.save(user);
-        return userRepository.findByEmail(command.username());
+        return userRepository.findByUsername(command.username());
     }
 
     /**
@@ -66,7 +68,9 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     public Long handle(CreateUserCommand command) {
-        if (userRepository.existsByEmail(command.username()))
+        if (userRepository.existsByEmail(command.email()))
+            throw new RuntimeException("User " + command.email() + " already exists");
+        if (userRepository.existsByUsername(command.username()))
             throw new RuntimeException("User " + command.username() + " already exists");
         if (command.roles().isEmpty()) {
             throw new RuntimeException("User " + command.username() + " must have at least one role");
@@ -74,7 +78,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         var roles = command.roles().stream().map(role -> roleRepository.findByName(role.getName())
                 .orElseThrow(() -> new RuntimeException("Role not found"))).toList();
 
-        var user = new User(command.username(), command.password(), roles);
+        var user = new User(command.username(), command.email(), command.password(), roles);
         userRepository.save(user);
         return user.getId();
     }

@@ -20,6 +20,6 @@ public class SignUpCommandFromResourceAssembler {
                 ? signUpResource.roles().stream().map(Role::toRoleFromName).toList()
                 : new ArrayList<Role>();
         System.out.println("roles: " + roles);
-        return new SignUpCommand(signUpResource.email(), signUpResource.password(), roles);
+        return new SignUpCommand(signUpResource.username(), signUpResource.email(), signUpResource.password(), roles);
     }
 }
