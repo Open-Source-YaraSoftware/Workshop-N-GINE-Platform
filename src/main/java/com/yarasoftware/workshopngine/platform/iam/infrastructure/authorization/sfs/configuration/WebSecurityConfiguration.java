@@ -1,6 +1,6 @@
 package com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.configuration;
 
-import com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.handlers.AuthenticationSuccessTokenHandler;
+import com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.pipeline.AuthenticationSuccessTokenHandler;
 import com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.pipeline.BearerAuthorizationRequestFilter;
 import com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.services.OAuth2UserServiceImpl;
 import com.yarasoftware.workshopngine.platform.iam.infrastructure.authorization.sfs.services.OIDCUserServiceImpl;
